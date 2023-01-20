@@ -27,7 +27,14 @@ async def delete_employee(id: str):
       return Response(content=response, status_code=200, media_type="application/json")
     except Exception as e:
       return Response(content={"error": str(e)}, status_code=500, media_type="application/json")
-
+    
+@employees_router.put("/{id}")
+async def update_employee(id: str, request: Request):
+    try:
+      response = await service.update_employee(id, request.json())
+      return Response(content=response, status_code=200, media_type="application/json")
+    except Exception as e:
+      return Response(content={"error": str(e)}, status_code=500, media_type="application/json")
 
 @employees_router.get("/{id}/subordinates")
 async def get_subordinates(id: str):

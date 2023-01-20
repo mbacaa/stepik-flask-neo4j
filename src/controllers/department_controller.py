@@ -28,4 +28,11 @@ async def get_department_employees(id: str):
     except Exception as e:
       return Response(content={"error": str(e)}, status_code=500, media_type="application/json")
 
+@department_router.get("/")
+async def get_departments():
+    try:
+      response = await service.get_departments()
+      return Response(content=response, status_code=200, media_type="application/json")
+    except Exception as e:
+      return Response(content={"error": str(e)}, status_code=500, media_type="application/json")
 

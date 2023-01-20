@@ -12,6 +12,21 @@ class EmployeesService:
             session.run("CREATE (e:Employee {employee})", employee=employee)
             return json.dumps(employee)
 
+    async def update_employee(self,id,employee):
+        with driver.session() as session:    
+            employee_exists = await session.run("MATCH (e:Employee) WHERE e.id = $id RETURN e", id=id).data()
+            if len(employee_exists) == 0:
+                raise Exception('User not found')
+            else:
+                employee_exists['name'] = employee['name']
+                employee_exists['salary'] = employee['salary']
+                employee_exists['age'] = employee['age']
+                
+                session.run("MATCH (e:Employee) WHERE id(e) = $id SET e.name = $name, e.salary = $salary, e.age = $age", id=id, name=employee_exists['name'], salary=employee_exists['salary'], age=employee_exists['age'])
+                if employee['new_department'] != None:
+                    session.run("MATCH (e:Employee) WHERE id(e) = $id MATCH (d:Department) WHERE d.name = $department CREATE (e)-[:WORKS_IN]->(d)", id=id, department=employee['new_department'])
+                return json.dumps({'message':'Updated succesfuly'}), 200
+
     async def delete_employee(self, id):
         with driver.session() as session:
             session.run("MATCH (e:Employee) WHERE e.id = $id DETACH DELETE e", id=id)
